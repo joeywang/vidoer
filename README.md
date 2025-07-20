@@ -141,21 +141,240 @@ The backend will be available at `http://localhost:3001`.
 
 ## Debugging
 
-To debug the application, you can use the browser's developer tools for the frontend and the Node.js inspector for the backend.
+This project includes comprehensive debugging tools and configurations for both frontend and backend development.
 
-### Frontend
+### Quick Start Debugging
 
-To debug the frontend, open the browser's developer tools and go to the "Sources" tab. You can set breakpoints and inspect the code from there.
-
-### Backend
-
-To debug the backend, you can start the server with the `--inspect` flag:
+Use the Makefile for easy debugging:
 
 ```bash
-node --inspect src/index.js
+make debug              # Debug both frontend and backend
+make debug-frontend     # Debug frontend only
+make debug-backend      # Debug backend only
+make debug-health       # Check service health
+make debug-ports        # Check which ports are in use
 ```
 
-You can then use a debugger like the Chrome DevTools for Node.js to connect to the inspector and debug the code.
+### VSCode Debugging
+
+The project includes VSCode debug configurations in `.vscode/launch.json`:
+
+1. **Debug Backend** - Launch backend with TypeScript debugging
+2. **Debug Backend (Attach)** - Attach to running backend (port 9229)
+3. **Debug Frontend** - Launch Next.js with debugging enabled
+4. **Debug Full Stack** - Debug both frontend and backend simultaneously
+5. **Debug Tests** - Debug backend tests with Jest
+
+**To use:**
+1. Open the project in VSCode
+2. Go to Run and Debug panel (Ctrl+Shift+D)
+3. Select your desired debug configuration
+4. Press F5 or click the green play button
+
+### Frontend Debugging
+
+#### Browser DevTools
+```bash
+# Start frontend in debug mode
+make debug-frontend
+# Or manually:
+cd frontend && NODE_OPTIONS="--inspect" npm run dev
+```
+
+**Features:**
+- Automatic source maps for TypeScript
+- React DevTools support
+- Next.js built-in debugging
+- Hot reload with debug preservation
+
+**Browser Tools:**
+- **F12** - Open DevTools
+- **Sources Tab** - Set breakpoints, step through code
+- **Console Tab** - View logs and run JavaScript
+- **Network Tab** - Monitor API calls
+- **React DevTools** - Inspect React components (install extension)
+
+#### Frontend Debug Tips
+```javascript
+// Add debug breakpoints in code
+debugger;
+
+// Console logging
+console.log('Debug info:', variable);
+console.table(arrayData);
+console.group('API Call');
+console.log('Request:', request);
+console.log('Response:', response);
+console.groupEnd();
+
+// Next.js specific debugging
+if (process.env.NODE_ENV === 'development') {
+  console.log('Development only debug info');
+}
+```
+
+### Backend Debugging
+
+#### Node.js Inspector
+```bash
+# Start backend in debug mode
+make debug-backend
+# Or manually:
+cd backend && NODE_OPTIONS="--inspect=0.0.0.0:9229" npm start
+
+# For break-on-start debugging:
+cd backend && npm run debug
+```
+
+**Chrome DevTools:**
+1. Open Chrome and go to `chrome://inspect`
+2. Click "Configure" and add `localhost:9229`
+3. Click "inspect" under your Node.js process
+4. Use the Sources tab to set breakpoints
+
+#### VSCode Node Debugging
+1. Use "Debug Backend" configuration to launch
+2. Or use "Debug Backend (Attach)" to attach to running process
+3. Set breakpoints directly in VSCode
+4. Use the Debug Console for evaluation
+
+#### Backend Debug Scripts
+```bash
+# Available npm scripts in backend/
+npm run start:debug     # Start with inspector
+npm run start:dev       # Start with nodemon + inspector
+npm run debug           # Start with break-on-start
+```
+
+### Debug Utilities
+
+The project includes helpful debug utilities:
+
+```bash
+# Show debug utilities help
+make debug-utils
+
+# Available utilities:
+./scripts/debug-utils.sh logs       # Show application logs
+./scripts/debug-utils.sh ports      # Check port usage
+./scripts/debug-utils.sh processes  # Show Node.js processes
+./scripts/debug-utils.sh health     # Check service health
+./scripts/debug-utils.sh kill       # Kill development processes
+./scripts/debug-utils.sh env        # Show environment info
+./scripts/debug-utils.sh network    # Test connectivity
+./scripts/debug-utils.sh clean      # Clean debug artifacts
+```
+
+### Debugging Docker Containers
+
+```bash
+# Build and run container in debug mode
+make docker-build
+make docker-run-dev     # With volume mounts
+
+# Access running container
+make docker-shell       # Get shell access
+make docker-logs        # View container logs
+
+# Debug container issues
+docker ps                           # Check running containers
+docker logs vidoer                  # View container logs
+docker exec -it vidoer sh          # Shell into container
+```
+
+### Common Debugging Scenarios
+
+#### Port Conflicts
+```bash
+# Check what's using your ports
+make debug-ports
+
+# Kill processes on specific ports
+lsof -ti :3000 | xargs kill -9     # Kill frontend
+lsof -ti :3001 | xargs kill -9     # Kill backend
+lsof -ti :9229 | xargs kill -9     # Kill debug port
+
+# Or use the utility
+make debug-kill
+```
+
+#### Service Not Starting
+```bash
+# Check service health
+make debug-health
+
+# View logs
+make debug-logs
+
+# Check environment
+./scripts/debug-utils.sh env
+```
+
+#### API Issues
+```bash
+# Test backend directly
+curl http://localhost:3001/api/health
+
+# Check network connectivity
+./scripts/debug-utils.sh network
+
+# Monitor API calls in browser DevTools Network tab
+```
+
+#### Build Issues
+```bash
+# Clean everything and rebuild
+make clean
+make setup
+make build
+
+# Check dependencies
+npm ls                  # Check for dependency issues
+npm audit              # Security audit
+```
+
+### Debug Environment Variables
+
+Set these environment variables for enhanced debugging:
+
+```bash
+# Backend debugging
+export DEBUG="*"                    # Enable all debug output
+export NODE_ENV="development"       # Development mode
+export LOG_LEVEL="debug"            # Detailed logging
+
+# Frontend debugging
+export NEXT_TELEMETRY_DISABLED=1    # Disable Next.js telemetry
+export NODE_OPTIONS="--inspect"     # Enable inspector
+```
+
+### Debugging Tips
+
+1. **Use meaningful console.log messages** with context
+2. **Set breakpoints** rather than relying only on console.log
+3. **Use the debugger statement** for dynamic breakpoints
+4. **Monitor network requests** in browser DevTools
+5. **Check browser console** for client-side errors
+6. **Use React DevTools** for component debugging
+7. **Test API endpoints** independently with curl/Postman
+8. **Check Docker logs** when running in containers
+9. **Use git bisect** to find when issues were introduced
+10. **Clean and reinstall dependencies** if behavior is strange
+
+### Performance Debugging
+
+```bash
+# Frontend performance
+# Use Chrome DevTools Performance tab
+# Check Lighthouse scores
+# Monitor bundle sizes
+
+# Backend performance
+NODE_OPTIONS="--inspect --expose-gc" npm start
+# Use Chrome DevTools Memory tab
+# Profile CPU usage
+# Monitor memory leaks
+```
 
 ## Deployment
 
