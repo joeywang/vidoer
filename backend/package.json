@@ -5,7 +5,10 @@
   "main": "index.js",
   "scripts": {
     "start": "ts-node src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:debug": "node --inspect=0.0.0.0:9229 --loader ts-node/esm src/index.ts",
+    "start:dev": "nodemon --inspect=0.0.0.0:9229 --loader ts-node/esm src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "node --inspect-brk=0.0.0.0:9229 --loader ts-node/esm src/index.ts"
   },
   "keywords": [],
   "author": "",

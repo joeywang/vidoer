@@ -13,7 +13,7 @@ YELLOW = \033[1;33m
 RED = \033[0;31m
 NC = \033[0m # No Color
 
-.PHONY: help setup install clean test lint build docker-build docker-run docker-stop docker-clean dev start logs fmt check all
+.PHONY: help setup install clean test lint build docker-build docker-run docker-stop docker-clean dev start logs fmt check all debug debug-frontend debug-backend debug-fullstack debug-utils
 
 # Default target
 all: setup test build
@@ -211,6 +211,46 @@ status: ## Show project status
 	@echo "Frontend dependencies: $(shell test -d frontend/node_modules && echo 'Installed' || echo 'Not installed')"
 	@echo "Backend dependencies: $(shell test -d backend/node_modules && echo 'Installed' || echo 'Not installed')"
 	@echo "Docker image: $(shell docker images -q $(DOCKER_IMAGE):$(DOCKER_TAG) 2>/dev/null && echo 'Built' || echo 'Not built')"
+
+# Debugging
+debug: ## Start full-stack debugging (same as debug-fullstack)
+	@$(MAKE) debug-fullstack
+
+debug-frontend: ## Debug frontend with enhanced logging
+	@echo "$(GREEN)Starting frontend in debug mode...$(NC)"
+	./scripts/debug-frontend.sh
+
+debug-backend: ## Debug backend with inspector enabled
+	@echo "$(GREEN)Starting backend in debug mode...$(NC)"
+	./scripts/debug-backend.sh
+
+debug-fullstack: ## Debug both frontend and backend
+	@echo "$(GREEN)Starting full-stack debugging...$(NC)"
+	./scripts/debug-fullstack.sh
+
+debug-utils: ## Show debug utilities help
+	@echo "$(GREEN)Debug Utilities:$(NC)"
+	./scripts/debug-utils.sh help
+
+debug-logs: ## Show application logs
+	@echo "$(GREEN)Showing debug logs...$(NC)"
+	./scripts/debug-utils.sh logs
+
+debug-ports: ## Check port usage
+	@echo "$(GREEN)Checking ports...$(NC)"
+	./scripts/debug-utils.sh ports
+
+debug-health: ## Check service health
+	@echo "$(GREEN)Checking service health...$(NC)"
+	./scripts/debug-utils.sh health
+
+debug-kill: ## Kill all development processes
+	@echo "$(YELLOW)Killing development processes...$(NC)"
+	./scripts/debug-utils.sh kill
+
+debug-clean: ## Clean debug artifacts
+	@echo "$(YELLOW)Cleaning debug artifacts...$(NC)"
+	./scripts/debug-utils.sh clean
 
 # Shortcuts
 i: install ## Shortcut for install
