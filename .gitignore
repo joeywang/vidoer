@@ -1,0 +1,16 @@
+node_modules/
+.next/
+build/
+dist/
+
+# Backend
+backend/node_modules/
+backend/uploads/
+
+# Frontend
+frontend/node_modules/
+frontend/.next/
+
+# IDE config
+.vscode/
+.idea/
