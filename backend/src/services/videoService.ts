@@ -4,7 +4,7 @@ import path from 'path';
 import fs from 'fs';
 
 // Set FFmpeg path
-if (ffmpegPath) {
+if (ffmpegPath && typeof ffmpeg.setFfmpegPath === 'function') {
   ffmpeg.setFfmpegPath(ffmpegPath);
 }
 

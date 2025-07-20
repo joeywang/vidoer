@@ -243,7 +243,7 @@ export class FileUtils {
         png: [0x89, 0x50, 0x4E, 0x47],
         gif: [0x47, 0x49, 0x46],
         bmp: [0x42, 0x4D],
-        webp: [0x52, 0x49, 0x46, 0x46] // RIFF for WebP
+        webp: [0x52, 0x49, 0x46, 0x46, 0x57, 0x45, 0x42, 0x50] // RIFF + WEBP
       };
 
       for (const [format, signature] of Object.entries(signatures)) {
@@ -265,10 +265,16 @@ export class FileUtils {
     try {
       const buffer = fs.readFileSync(filePath);
       
-      // Check for common audio file signatures
+      // Check for WAV (RIFF + WAVE)
+      if (buffer.length >= 12 &&
+          buffer[0] === 0x52 && buffer[1] === 0x49 && buffer[2] === 0x46 && buffer[3] === 0x46 && // RIFF
+          buffer[8] === 0x57 && buffer[9] === 0x41 && buffer[10] === 0x56 && buffer[11] === 0x45) { // WAVE
+        return true;
+      }
+      
+      // Check for other audio file signatures
       const signatures = {
         mp3: [0xFF, 0xFB], // MP3 with MPEG-1 Layer 3
-        wav: [0x52, 0x49, 0x46, 0x46], // RIFF header
         flac: [0x66, 0x4C, 0x61, 0x43], // fLaC
         ogg: [0x4F, 0x67, 0x67, 0x53] // OggS
       };

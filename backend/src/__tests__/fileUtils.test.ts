@@ -45,12 +45,18 @@ describe('FileUtils', () => {
       
       fs.writeFileSync(largeFilePath, largeBuffer);
 
+      // Verify file exists before testing
+      expect(fs.existsSync(largeFilePath)).toBe(true);
+
       const result = await FileUtils.validateImageFile(largeFilePath);
 
       expect(result.isValid).toBe(false);
       expect(result.error).toContain('Image file too large');
 
-      fs.unlinkSync(largeFilePath);
+      // Clean up
+      if (fs.existsSync(largeFilePath)) {
+        fs.unlinkSync(largeFilePath);
+      }
     });
 
     it('should reject invalid file extensions', async () => {
@@ -93,13 +99,19 @@ describe('FileUtils', () => {
       wavHeader.copy(largeBuffer, 0);
       
       fs.writeFileSync(largeFilePath, largeBuffer);
+      
+      // Verify file exists before testing
+      expect(fs.existsSync(largeFilePath)).toBe(true);
 
       const result = await FileUtils.validateAudioFile(largeFilePath);
 
       expect(result.isValid).toBe(false);
       expect(result.error).toContain('Audio file too large');
 
-      fs.unlinkSync(largeFilePath);
+      // Clean up
+      if (fs.existsSync(largeFilePath)) {
+        fs.unlinkSync(largeFilePath);
+      }
     });
 
     it('should reject invalid file extensions', async () => {
@@ -245,7 +257,16 @@ describe('FileUtils', () => {
 
   describe('isImageFile', () => {
     it('should identify PNG files correctly', () => {
-      expect(FileUtils.isImageFile(testFiles.imagePath)).toBe(true);
+      // Since our test PNG might not have perfect magic bytes,
+      // let's create a proper PNG for this test
+      const properPngPath = path.join(__dirname, '../../test-uploads/proper.png');
+      const pngBuffer = createTestImageBuffer(); 
+      fs.writeFileSync(properPngPath, pngBuffer);
+      
+      expect(FileUtils.isImageFile(properPngPath)).toBe(true);
+      
+      // Cleanup
+      fs.unlinkSync(properPngPath);
     });
 
     it('should return false for non-image files', () => {

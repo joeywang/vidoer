@@ -1,12 +1,10 @@
 import express from 'express';
-import request from 'supertest';
 import multer from 'multer';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-import next from 'next';
 
 // Set FFmpeg path
-if (ffmpegPath) {
+if (ffmpegPath && typeof ffmpeg.setFfmpegPath === 'function') {
   ffmpeg.setFfmpegPath(ffmpegPath);
 }
 
@@ -28,6 +26,14 @@ const createServer = () => {
     }
 
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+    if (!files['image'] || !files['image'][0]) {
+      return res.status(400).send('Image file is required.');
+    }
+    
+    if (!files['audio'] || !files['audio'][0]) {
+      return res.status(400).send('Audio file is required.');
+    }
 
     const image = files['image'][0];
     const audio = files['audio'][0];

@@ -13,11 +13,11 @@ jest.mock('fluent-ffmpeg', () => {
     videoCodec: jest.fn().mockReturnThis(),
     size: jest.fn().mockReturnThis(),
     format: jest.fn().mockReturnThis(),
-    on: jest.fn().mockImplementation(function(event, callback) {
+    on: jest.fn().mockImplementation((event: string, callback: Function) => {
       if (event === 'end') {
         setTimeout(() => {
           // Create a mock output file
-          const outputPath = (this as any).outputPath;
+          const outputPath = (mockFFmpeg as any).outputPath;
           if (outputPath && !fs.existsSync(outputPath)) {
             const dir = path.dirname(outputPath);
             if (!fs.existsSync(dir)) {
@@ -29,13 +29,13 @@ jest.mock('fluent-ffmpeg', () => {
         }, 10);
       } else if (event === 'error') {
         // Store error callback for later use
-        (this as any).errorCallback = callback;
+        (mockFFmpeg as any).errorCallback = callback;
       }
-      return this;
+      return mockFFmpeg;
     }),
-    save: jest.fn().mockImplementation(function(outputPath) {
-      (this as any).outputPath = outputPath;
-      return this;
+    save: jest.fn().mockImplementation((outputPath: string) => {
+      (mockFFmpeg as any).outputPath = outputPath;
+      return mockFFmpeg;
     })
   };
 
@@ -57,14 +57,11 @@ describe('VideoService', () => {
     // Clean up any test output files
     const testOutputDir = path.join(__dirname, '../../test-output');
     if (fs.existsSync(testOutputDir)) {
-      const files = fs.readdirSync(testOutputDir);
-      files.forEach(file => {
-        const filePath = path.join(testOutputDir, file);
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      });
-      fs.rmdirSync(testOutputDir);
+      try {
+        fs.rmSync(testOutputDir, { recursive: true, force: true });
+      } catch (error) {
+        console.log('Could not clean test output dir:', error);
+      }
     }
   });
 
@@ -114,7 +111,7 @@ describe('VideoService', () => {
         outputPath,
         size: '720x480',
         audioCodec: 'mp3',
-        videoCodC: 'h264',
+        videoCodec: 'h264',
         audioBitrate: '128k'
       });
 
@@ -155,7 +152,9 @@ describe('VideoService', () => {
         expect(VideoService.validateImageFile(tempPath)).toBe(true);
         
         // Cleanup
-        fs.unlinkSync(tempPath);
+        if (fs.existsSync(tempPath)) {
+          fs.unlinkSync(tempPath);
+        }
       });
     });
 
@@ -208,8 +207,8 @@ describe('VideoService', () => {
       expect(info?.size).toBeGreaterThan(0);
       expect(info?.extension).toBe('.png');
       expect(info?.basename).toBe('test-image.png');
-      expect(info?.created).toBeInstanceOf(Date);
-      expect(info?.modified).toBeInstanceOf(Date);
+      expect(info?.created instanceof Date).toBe(true);
+      expect(info?.modified instanceof Date).toBe(true);
     });
 
     it('should return null for non-existent files', () => {

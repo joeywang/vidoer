@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { jest } from '@jest/globals';
 
 // Create a test image buffer (1x1 pixel PNG)
 export const createTestImageBuffer = (): Buffer => {
@@ -79,15 +80,19 @@ export const createTestFiles = () => {
     imagePath,
     audioPath,
     cleanup: () => {
-      if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-      if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
+      try {
+        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+        if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
+      } catch (error) {
+        console.log('Cleanup error:', error);
+      }
     }
   };
 };
 
 // Mock ffmpeg for testing
 export const mockFFmpeg = () => {
-  const mockFFmpeg = {
+  const mockFFmpeg: any = {
     input: jest.fn().mockReturnThis(),
     loop: jest.fn().mockReturnThis(),
     audioCodec: jest.fn().mockReturnThis(),
@@ -95,9 +100,12 @@ export const mockFFmpeg = () => {
     videoCodec: jest.fn().mockReturnThis(),
     size: jest.fn().mockReturnThis(),
     format: jest.fn().mockReturnThis(),
-    on: jest.fn().mockImplementation((event, callback) => {
+    on: jest.fn().mockImplementation((...args: any[]) => {
+      const [event, callback] = args;
       if (event === 'end') {
-        setTimeout(callback, 100); // Simulate async completion
+        setTimeout(() => {
+          callback();
+        }, 100); // Simulate async completion
       }
       return mockFFmpeg;
     }),
