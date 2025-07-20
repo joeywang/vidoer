@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vidoer
+  labels:
+    app: vidoer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vidoer
+  template:
+    metadata:
+      labels:
+        app: vidoer
+    spec:
+      containers:
+      - name: vidoer
+        image: vidoer
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3001
