@@ -89,7 +89,7 @@ test-frontend: ## Run frontend tests
 
 test-backend: ## Run backend tests
 	@echo "$(GREEN)Running backend tests...$(NC)"
-	cd backend && npm test --if-present
+	cd backend && npm test
 
 test-watch: ## Run tests in watch mode
 	@echo "$(GREEN)Running tests in watch mode...$(NC)"
@@ -97,6 +97,22 @@ test-watch: ## Run tests in watch mode
 	(cd backend && npm run test:watch --if-present) & \
 	(cd frontend && npm run test:watch --if-present) & \
 	wait
+
+test-coverage: ## Run tests with coverage report
+	@echo "$(GREEN)Running tests with coverage...$(NC)"
+	cd backend && npm run test:coverage
+
+test-backend-watch: ## Run backend tests in watch mode
+	@echo "$(GREEN)Running backend tests in watch mode...$(NC)"
+	cd backend && npm run test:watch
+
+test-backend-coverage: ## Run backend tests with coverage
+	@echo "$(GREEN)Running backend tests with coverage...$(NC)"
+	cd backend && npm run test:coverage
+
+test-backend-debug: ## Debug backend tests
+	@echo "$(GREEN)Starting backend tests in debug mode...$(NC)"
+	cd backend && npm run test:debug
 
 # Linting and Formatting
 lint: ## Run linting for all projects
