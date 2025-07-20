@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: vidoer
+  pullPolicy: IfNotPresent
+  tag: ""
+
+service:
+  type: NodePort
+  port: 80
+  targetPort: 3001
